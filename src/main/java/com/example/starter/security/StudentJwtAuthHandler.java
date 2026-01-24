@@ -15,7 +15,7 @@ public enum StudentJwtAuthHandler implements Handler<RoutingContext> {
     String authHeader = ctx.request().getHeader("Authorization");
     if(authHeader==null || !authHeader.startsWith("Bearer ")){
       ctx.response()
-        .setStatusCode(404)
+        .setStatusCode(401)
         .end("Missing or Invalid token");
       return ;
     }

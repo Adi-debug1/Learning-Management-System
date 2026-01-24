@@ -26,15 +26,17 @@ public enum TeacherRouter implements Handler<RoutingContext> {
 //    //get teacher by id
 //    router.get("/teacher/:id").handler(GetTeacherById.INSTANCE);
 
+    System.out.println("Inside the teacher");
+
 
     //teacher login
     router.route("/teacher/login").handler(TeacherLogin.INSTANCE);
+
     //JWT Authentication
     router.route("/teacher/*").handler(TeacherJwtAuthHandler.INSTANCE);
 
     //KYC upload
     router.post("/teacher/kyc/upload")
-      .handler(TeacherJwtAuthHandler.INSTANCE)
       .handler(BodyHandler.create().setUploadsDirectory("uploads"))
       .handler(TeacherKycUpload.INSTANCE);
 

@@ -23,7 +23,10 @@ public enum StudentKycUpload implements Handler<RoutingContext> {
   @Override
   public void handle(RoutingContext ctx) {
 
-    long adminId = ctx.user().principal().getLong("adminId");
+    if (ctx.user() == null) {
+      ctx.fail(401); // unauthorized
+      return;
+    }
 
     if (ctx.request().getParam("userId") == null ||
       ctx.request().getParam("documentType") == null ||
@@ -32,7 +35,11 @@ public enum StudentKycUpload implements Handler<RoutingContext> {
       return;
     }
 
-    long studentId = ctx.user().principal().getLong("userId");
+    Long studentId = ctx.get("userId");
+    if (studentId == null) {
+      ctx.fail(401);
+      return;
+    }
 
     String documentTypeStr = ctx.request().getParam("documentType");
     String documentNumber = ctx.request().getParam("documentNumber");

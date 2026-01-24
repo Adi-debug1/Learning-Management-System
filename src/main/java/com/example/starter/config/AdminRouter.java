@@ -31,14 +31,17 @@ public enum AdminRouter implements Handler<RoutingContext> {
 
   public void router(Router router){
     // PUBLIC
+
     router.post("/admin/login").handler(AdminLogin.INSTANCE);
 
+
+    router.post("/admin/add").handler(CreateAdmin.INSTANCE);
     router.post("/admin/student").handler(CreateStudent.INSTANCE);
+    router.post("/admin/teacher").handler(CreateTeacher.INSTANCE);
 
     // JWT PROTECTION
     router.route("/admin/*").handler(AdminJwtAuthHandler.INSTANCE);
 
-    router.post("/admin/add").handler(CreateAdmin.INSTANCE);
 
     router.put("/admin/update/:id")
       .handler(UpdateAdmin.INSTANCE);
@@ -62,7 +65,6 @@ public enum AdminRouter implements Handler<RoutingContext> {
     router.delete("/admin/student/:id").handler(DeleteStudentById.INSTANCE);
 
     // teacher
-    router.post("/admin/teacher").handler(CreateTeacher.INSTANCE);
     router.get("/admin/teacher/:id").handler(GetTeacherById.INSTANCE);
     router.delete("/admin/teacher/:id").handler(DeleteTeacherById.INSTANCE);
 
