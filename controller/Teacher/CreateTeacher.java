@@ -15,12 +15,6 @@ public enum CreateTeacher implements Handler<RoutingContext> {
 
   @Override
   public void handle(RoutingContext ctx) {
-    String role = ctx.get("role").toString();
-    if(!"ADMIN".equals(role)){
-      ctx.response()
-        .setStatusCode(403)
-        .end("Access Denied");
-    }
 
     ctx.vertx().executeBlocking(() -> {
         Teacher teacher = ctx.body().asJsonObject().mapTo(Teacher.class);
@@ -29,7 +23,7 @@ public enum CreateTeacher implements Handler<RoutingContext> {
           BCrypt.gensalt(10)
         );
         teacher.setPassword(hashPassword);
-        teacher.setRole(Role.STUDENT);
+        teacher.setRole(Role.TEACHER);
         teacher.setCreatedAt(Instant.now());
 
         subjectRepository.save(teacher);

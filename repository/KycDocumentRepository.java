@@ -15,15 +15,22 @@ public class KycDocumentRepository {
 
   public KycDocument findById(long id){ return DB.find(KycDocument.class, id); }
 
-  public KycDocument findByUserIdAndType(long userId, DocumentType documentType) {
+  public KycDocument findByUserEmailAndType(String email, DocumentType documentType) {
     return DB.find(KycDocument.class)
       .where()
-      .eq("userId", userId)
+      .eq("userEmail", email)
       .eq("documentType", documentType)
       .findOne();
   }
 
   public List<KycDocument> findAll() {
     return DB.find(KycDocument.class).findList();
+  }
+
+  public KycDocument findByUserEmail(String userEmail){
+    return  DB.find(KycDocument.class)
+      .where()
+      .eq("userEmail", userEmail)
+      .findOne();
   }
 }

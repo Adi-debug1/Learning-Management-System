@@ -1,5 +1,6 @@
 package com.example.starter.config;
 
+import com.example.starter.controller.Kyc.CheckStatusOfKyc;
 import com.example.starter.controller.Kyc.KycUpload;
 import com.example.starter.controller.Kyc.StudentKycUpload;
 import com.example.starter.controller.Student.DeleteStudentById;
@@ -34,12 +35,26 @@ public enum StudentRouter implements Handler<RoutingContext> {
     router.post("/student/login").handler(StudentLogin.INSTANCE);
 
     //JWT middleware
-    router.route("/student/*").handler(StudentJwtAuthHandler.INSTANCE);
+//    router.route("/student/*").handler(StudentJwtAuthHandler.INSTANCE);
+//
+//    //KYC upload
+//    router.post("/student/kyc/upload")
+//      .handler(BodyHandler.create().setUploadsDirectory("uploads"))
+//      .handler(StudentKycUpload.INSTANCE);
 
-    //KYC upload
+    router.route("/student/*")
+        .handler(BodyHandler.create().setUploadsDirectory("uploads"));
+
+  // JWT AFTER body parsing
+    router.route("/student/*")
+        .handler(StudentJwtAuthHandler.INSTANCE);
+
+  // KYC upload
     router.post("/student/kyc/upload")
-      .handler(BodyHandler.create().setUploadsDirectory("uploads"))
       .handler(StudentKycUpload.INSTANCE);
+    router.get("/student/check/kyc").handler(CheckStatusOfKyc.INSTANCE);
+
+
     //update student
     router.put("/student/update/:id").handler(UpdateStudentById.INSTANCE);
     //Delete the student by id

@@ -16,7 +16,16 @@ public enum CreateStudent implements Handler<RoutingContext> {
 
   @Override
   public void handle(RoutingContext ctx) {
+
+    Student studentData = ctx.body().asJsonObject().mapTo(Student.class);
+    String email = studentData.getEmail();
+
     ctx.vertx().executeBlocking(() -> {
+
+      if(repo.findByEmail(email)!=null){
+        throw new RuntimeException("Student already exist");
+      }
+
         Student student = ctx.body().asJsonObject().mapTo(Student.class);
         String hashPassword = BCrypt.hashpw(
           student.getPassword(),
@@ -25,6 +34,7 @@ public enum CreateStudent implements Handler<RoutingContext> {
         student.setPassword(hashPassword);
         student.setRole(Role.STUDENT);
         student.setCreatedAt(Instant.now());
+
 
         repo.save(student);
         return student;
@@ -39,7 +49,15 @@ public enum CreateStudent implements Handler<RoutingContext> {
       )
       .onFailure(err ->
         {
-          ctx.fail(err);
+          if ("Student already exist".equals(err.getMessage())) {
+            ctx.response()
+              .setStatusCode(409)
+              .end("Student already exist");
+          } else {
+            ctx.response()
+              .setStatusCode(500)
+              .end("Internal Server Error");
+          }
         }
       );
   }

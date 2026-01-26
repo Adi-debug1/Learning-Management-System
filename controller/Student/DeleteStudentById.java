@@ -11,6 +11,15 @@ public enum DeleteStudentById implements Handler<RoutingContext> {
 
   @Override
   public void handle(RoutingContext ctx) {
+    Object roleObj = ctx.get("role");
+
+    if (roleObj == null || !"ADMIN".equals(roleObj.toString())) {
+      ctx.response()
+        .setStatusCode(403)
+        .end("Access Denied");
+      return;
+    }
+
     int id;
     try{
       id = Integer.parseInt(ctx.pathParam("id"));

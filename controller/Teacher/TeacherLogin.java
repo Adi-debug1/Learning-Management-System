@@ -20,6 +20,7 @@ public enum TeacherLogin implements Handler<RoutingContext> {
   @Override
   public void handle(RoutingContext ctx) {
     ctx.vertx().executeBlocking(()->{
+
       String email = ctx.body().asJsonObject().getString("email");
       String password = ctx.body().asJsonObject().getString("password");
       Teacher teacher = teacherRepository.findByEmail(email);
@@ -43,7 +44,7 @@ public enum TeacherLogin implements Handler<RoutingContext> {
     })
       .onSuccess(token->{
         ctx.response()
-          .putHeader("Content-Type","application-json")
+          .putHeader("Content-Type","application/json")
           .setStatusCode(200)
           .end("{\"token\": \"" + token + "\"}");
       })

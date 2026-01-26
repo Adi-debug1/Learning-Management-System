@@ -23,8 +23,8 @@ public enum StudentLogin implements Handler<RoutingContext> {
 
       String email = ctx.body().asJsonObject().getString("email");
       String password = ctx.body().asJsonObject().getString("password");
-
       Student student = studentRepository.findByEmail(email);
+
       if(student == null){
         throw new RuntimeException("Invalid email");
       }

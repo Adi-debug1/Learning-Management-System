@@ -5,7 +5,9 @@ import com.example.starter.controller.Admin.CreateAdmin;
 import com.example.starter.controller.Admin.GetAdminById;
 import com.example.starter.controller.Admin.UpdateAdmin;
 import com.example.starter.controller.BulkUpload.StartBulkUpload;
+import com.example.starter.controller.Kyc.AdminApproveKyc;
 import com.example.starter.controller.Kyc.KycOverride;
+import com.example.starter.controller.Kyc.KycUpload;
 import com.example.starter.controller.Kyc.ViewAllKyc;
 import com.example.starter.controller.Student.CreateStudent;
 import com.example.starter.controller.Student.DeleteStudentById;
@@ -31,14 +33,17 @@ public enum AdminRouter implements Handler<RoutingContext> {
 
   public void router(Router router){
     // PUBLIC
+
     router.post("/admin/login").handler(AdminLogin.INSTANCE);
 
+
+    router.post("/admin/add").handler(CreateAdmin.INSTANCE);
     router.post("/admin/student").handler(CreateStudent.INSTANCE);
+    router.post("/admin/teacher").handler(CreateTeacher.INSTANCE);
 
     // JWT PROTECTION
     router.route("/admin/*").handler(AdminJwtAuthHandler.INSTANCE);
 
-    router.post("/admin/add").handler(CreateAdmin.INSTANCE);
 
     router.put("/admin/update/:id")
       .handler(UpdateAdmin.INSTANCE);
@@ -50,6 +55,8 @@ public enum AdminRouter implements Handler<RoutingContext> {
     // KYC
     router.get("/admin/kyc").handler(ViewAllKyc.INSTANCE);
     router.post("/admin/kyc/override").handler(KycOverride.INSTANCE);
+    router.post("/admin/kyc/verify").handler(AdminApproveKyc.INSTANCE);
+    router.get("/admin/getKyc").handler(ViewAllKyc.INSTANCE);
 
     // fetch users
     router.get("/admin/getStudents").handler(GetStudent.INSTANCE);
@@ -62,7 +69,6 @@ public enum AdminRouter implements Handler<RoutingContext> {
     router.delete("/admin/student/:id").handler(DeleteStudentById.INSTANCE);
 
     // teacher
-    router.post("/admin/teacher").handler(CreateTeacher.INSTANCE);
     router.get("/admin/teacher/:id").handler(GetTeacherById.INSTANCE);
     router.delete("/admin/teacher/:id").handler(DeleteTeacherById.INSTANCE);
 

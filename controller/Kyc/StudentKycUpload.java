@@ -2,8 +2,10 @@ package com.example.starter.controller.Kyc;
 
 import com.example.starter.enums.DocumentType;
 import com.example.starter.enums.Role;
+import com.example.starter.enums.ValidationStatus;
 import com.example.starter.model.KycDocument;
 import com.example.starter.repository.KycDocumentRepository;
+import com.example.starter.service.FileValidationUtils;
 import com.example.starter.service.KycValidationService;
 import com.example.starter.service.ValidationResult;
 import io.vertx.core.Handler;
@@ -12,7 +14,6 @@ import io.vertx.ext.web.RoutingContext;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 
 public enum StudentKycUpload implements Handler<RoutingContext> {
   INSTANCE;
@@ -23,19 +24,18 @@ public enum StudentKycUpload implements Handler<RoutingContext> {
   @Override
   public void handle(RoutingContext ctx) {
 
-    long adminId = ctx.user().principal().getLong("adminId");
+    String userEmail = ctx.get("email");
+    String role = ctx.get("role");
 
-    if (ctx.request().getParam("userId") == null ||
-      ctx.request().getParam("documentType") == null ||
-      ctx.request().getParam("status") == null) {
-      ctx.fail(400);
+    if (userEmail == null || !"STUDENT".equals(role)) {
+      ctx.fail(401);
       return;
     }
 
-    long studentId = ctx.user().principal().getLong("userId");
 
     String documentTypeStr = ctx.request().getParam("documentType");
     String documentNumber = ctx.request().getParam("documentNumber");
+    String fileName = ctx.request().getParam("fileName");
     String fullName = ctx.request().getParam("fullName");
 
     DocumentType documentType;
@@ -52,6 +52,20 @@ public enum StudentKycUpload implements Handler<RoutingContext> {
       return;
     }
 
+    if(documentTypeStr == null || fileName == null){
+      ctx.response()
+        .setStatusCode(400)
+        .end("Missing required fields");
+      return ;
+    }
+    //file validation
+    if(!FileValidationUtils.isValidFileType(fileName)){
+      ctx.response()
+        .setStatusCode(400)
+        .end("Invalid file type");
+      return ;
+    }
+
     FileUpload file = uploads.iterator().next();
 
     // Validate
@@ -64,20 +78,20 @@ public enum StudentKycUpload implements Handler<RoutingContext> {
     );
 
     //  prevent duplicate document
-    if (repository.findByUserIdAndType(studentId, documentType) != null) {
+    if (repository.findByUserEmailAndType(userEmail, documentType) != null) {
       ctx.fail(409);
       return;
     }
 
     // Save document
     KycDocument doc = new KycDocument();
-    doc.setUserId(studentId);
+    doc.setUserEmail(userEmail);
     doc.setRole(Role.STUDENT);
     doc.setDocumentType(documentType);
     doc.setFileName(file.fileName());
     doc.setFileUrl(file.uploadedFileName());
-    doc.setValidationStatus(result.getStatus());
-    doc.setValidationMessage(result.getMessage());
+    doc.setValidationStatus(ValidationStatus.PENDING);
+    doc.setValidationMessage("Pending for admin verification");
     doc.setCreatedAt(Instant.now());
 
     repository.save(doc);
@@ -86,8 +100,8 @@ public enum StudentKycUpload implements Handler<RoutingContext> {
     ctx.json(
       new io.vertx.core.json.JsonObject()
         .put("documentType", documentType)
-        .put("status", result.getStatus())
-        .put("message", result.getMessage())
+        .put("status", ValidationStatus.PENDING)
+        .put("message", "Pending for admin verification")
     );
   }
 }

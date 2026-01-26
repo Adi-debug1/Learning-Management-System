@@ -11,11 +11,13 @@ public enum DeleteTeacherById implements Handler<RoutingContext> {
 
   @Override
   public void handle(RoutingContext ctx) {
-    String role = ctx.get("role").toString();
-    if(!"ADMIN".equals(role)){
+    Object roleObj = ctx.get("role");
+
+    if (roleObj == null || !"ADMIN".equals(roleObj.toString())) {
       ctx.response()
         .setStatusCode(403)
         .end("Access Denied");
+      return;
     }
 
     long id;

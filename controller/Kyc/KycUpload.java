@@ -14,37 +14,40 @@ public enum KycUpload implements Handler<RoutingContext> {
   @Override
   public void handle(RoutingContext ctx) {
 
-    try{
-      long userId = ctx.get("userId");
+    try {
+      String userEmail = ctx.get("email");
+      if (userEmail == null) {
+        ctx.response().setStatusCode(401).end("Unauthorized");
+        return;
+      }
 
       String documentTypeStr = ctx.request().getParam("documentType");
       String documentNumber = ctx.request().getParam("documentNumber");
       String nameOnDoc = ctx.request().getParam("nameOnDoc");
       String userName = ctx.request().getParam("userName");
-
       String fileName = ctx.request().getParam("fileName");
       String fileUrl = ctx.request().getParam("fileUrl");
 
-      //basic check
-      if(documentTypeStr == null || fileName == null){
-        ctx.response()
-          .setStatusCode(400)
-          .end("Missing required fields");
-        return ;
-      }
-      //file validation
-      if(!FileValidationUtils.isValidFileType(fileName)){
-        ctx.response()
-          .setStatusCode(400)
-          .end("Invalid file type");
-
-        return ;
+      if (documentTypeStr == null || fileName == null || fileUrl == null) {
+        ctx.response().setStatusCode(400).end("Missing required fields");
+        return;
       }
 
-      DocumentType documentType = DocumentType.valueOf(documentTypeStr);
+      if (!FileValidationUtils.isValidFileType(fileName)) {
+        ctx.response().setStatusCode(400).end("Invalid file type");
+        return;
+      }
+
+      DocumentType documentType;
+      try {
+        documentType = DocumentType.valueOf(documentTypeStr.toUpperCase());
+      } catch (IllegalArgumentException e) {
+        ctx.response().setStatusCode(400).end("Invalid document type");
+        return;
+      }
 
       KycDocument doc = processor.process(
-        userId,
+        userEmail,
         documentType,
         fileName,
         fileUrl,
@@ -53,7 +56,6 @@ public enum KycUpload implements Handler<RoutingContext> {
         userName
       );
 
-      //immediate response to uploader
       ctx.response()
         .setStatusCode(200)
         .end(
@@ -62,11 +64,14 @@ public enum KycUpload implements Handler<RoutingContext> {
             " | Message: " +
             doc.getValidationMessage()
         );
-    } catch (Exception e) {
+
+    }catch (Exception e) {
       e.printStackTrace();
-      ctx.response()
-        .setStatusCode(500)
-        .end("KYC upload failed");
+      if (!ctx.response().ended()) {
+        ctx.response()
+          .setStatusCode(500)
+          .end("KYC upload failed");
+      }
     }
   }
 }

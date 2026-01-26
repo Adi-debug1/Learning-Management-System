@@ -12,7 +12,7 @@ public class KycDocumentProcessor {
   private final KycDocumentRepository kycDocumentRepository = new KycDocumentRepository();
 
   public KycDocument process(
-    long userId,
+    String userEmail,
     DocumentType documentType,
     String fileName,
     String fileUrl,
@@ -34,7 +34,7 @@ public class KycDocumentProcessor {
         message = "Name mismatch";
       }else{
         status = ValidationStatus.VALID;
-        message = "PAN Validated successFully";
+        message = "Validation Pending by admin";
       }
 
     }
@@ -49,7 +49,7 @@ public class KycDocumentProcessor {
         message = "Name mismatch";
       }else{
         status = ValidationStatus.VALID;
-        message = "AADHAAR Validation successfully";
+        message = "Validation pending by admin";
       }
 
     }
@@ -63,14 +63,14 @@ public class KycDocumentProcessor {
         message = "Name mismatch";
       }else{
         status = ValidationStatus.VALID;
-        message = "PASSPORT Validation successfully";
+        message = "Validation pendin by admin";
       }
 
     }
 
     //save entity
     KycDocument doc = new KycDocument();
-    doc.setUserId(userId);
+    doc.setUserEmail(userEmail);
     doc.setDocumentType(documentType);
     doc.setFileName(fileName);
     doc.setFileUrl(fileUrl);

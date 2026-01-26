@@ -2,6 +2,7 @@ package com.example.starter.controller.Kyc;
 
 import com.example.starter.enums.DocumentType;
 import com.example.starter.enums.Role;
+import com.example.starter.enums.ValidationStatus;
 import com.example.starter.model.KycDocument;
 import com.example.starter.repository.KycDocumentRepository;
 import com.example.starter.service.KycValidationService;
@@ -23,7 +24,13 @@ public enum TeacherKycUpload implements Handler<RoutingContext> {
   @Override
   public void handle(RoutingContext ctx) {
 
-    long teacherId = ctx.user().principal().getLong("userId");
+    String teacherEmail = ctx.get("email");
+    String role = ctx.get("role");
+
+    if (teacherEmail == null || !"TEACHER".equals(role)) {
+      ctx.fail(401);
+      return;
+    }
 
     String documentTypeStr = ctx.request().getParam("documentType");
     String documentNumber = ctx.request().getParam("documentNumber");
@@ -55,20 +62,20 @@ public enum TeacherKycUpload implements Handler<RoutingContext> {
     );
 
     //  Prevent duplicate document
-    if (repository.findByUserIdAndType(teacherId, documentType) != null) {
+    if (repository.findByUserEmailAndType(teacherEmail, documentType) != null) {
       ctx.fail(409);
       return;
     }
 
     //  Save document
     KycDocument doc = new KycDocument();
-    doc.setUserId(teacherId);
+    doc.setUserEmail(teacherEmail);
     doc.setRole(Role.TEACHER);
     doc.setDocumentType(documentType);
     doc.setFileName(file.fileName());
     doc.setFileUrl(file.uploadedFileName());
-    doc.setValidationStatus(result.getStatus());
-    doc.setValidationMessage(result.getMessage());
+    doc.setValidationStatus(ValidationStatus.PENDING);
+    doc.setValidationMessage("Pending for admin verification");
     doc.setCreatedAt(Instant.now());
 
     repository.save(doc);
@@ -77,8 +84,8 @@ public enum TeacherKycUpload implements Handler<RoutingContext> {
     ctx.json(
       new io.vertx.core.json.JsonObject()
         .put("documentType", documentType)
-        .put("status", result.getStatus())
-        .put("message", result.getMessage())
+        .put("status", ValidationStatus.PENDING)
+        .put("message", "Pending for admin verification")
     );
   }
 }

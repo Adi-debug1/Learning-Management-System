@@ -18,7 +18,7 @@ public enum KycOverride implements Handler<RoutingContext> {
 
     long adminId = ctx.user().principal().getLong("adminId");
 
-    long userId = Long.parseLong(ctx.request().getParam("userId"));
+    String userEmail = ctx.request().getParam("email");
     DocumentType documentType ;
     try{
       documentType = DocumentType.valueOf(ctx.request().getParam("documentType"));
@@ -30,7 +30,7 @@ public enum KycOverride implements Handler<RoutingContext> {
     String reason = ctx.request().getParam("reason");
 
     // find document
-    KycDocument doc = repository.findByUserIdAndType(userId, documentType);
+    KycDocument doc = repository.findByUserEmailAndType(userEmail, documentType);
     if (doc == null) {
       ctx.fail(404);
       return;

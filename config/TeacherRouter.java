@@ -1,5 +1,6 @@
 package com.example.starter.config;
 
+import com.example.starter.controller.Kyc.CheckStatusOfKyc;
 import com.example.starter.controller.Kyc.KycUpload;
 import com.example.starter.controller.Kyc.TeacherKycUpload;
 import com.example.starter.controller.Teacher.GetTeacherById;
@@ -26,17 +27,20 @@ public enum TeacherRouter implements Handler<RoutingContext> {
 //    //get teacher by id
 //    router.get("/teacher/:id").handler(GetTeacherById.INSTANCE);
 
+    System.out.println("Inside the teacher");
+
 
     //teacher login
     router.route("/teacher/login").handler(TeacherLogin.INSTANCE);
+
     //JWT Authentication
     router.route("/teacher/*").handler(TeacherJwtAuthHandler.INSTANCE);
 
     //KYC upload
-    router.post("/teacher/kyc/upload")
-      .handler(TeacherJwtAuthHandler.INSTANCE)
+    router.post("/teacher/upload/kyc")
       .handler(BodyHandler.create().setUploadsDirectory("uploads"))
       .handler(TeacherKycUpload.INSTANCE);
+    router.get("/teacher/check/kyc").handler(CheckStatusOfKyc.INSTANCE);
 
     //update student by id
     router.put("/teacher/update/:id").handler(TeacherJwtAuthHandler.INSTANCE).handler(UpdateTeacherById.INSTANCE);

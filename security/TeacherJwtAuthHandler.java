@@ -32,9 +32,11 @@ public enum TeacherJwtAuthHandler implements Handler<RoutingContext> {
 
       Long userId = claims.get("userId", Long.class);
       String role = claims.get("role", String.class);
+      String email = claims.get("email", String.class);
 
       ctx.put("userId", userId);
       ctx.put("role", role);
+      ctx.put("email", email);
 
       ctx.next();
     } catch (Exception e) {
