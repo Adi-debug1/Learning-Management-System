@@ -1,0 +1,14 @@
+datasource:
+  db:
+    username: root
+    password: Aditya@123
+    url: jdbc:mysql://localhost:3306/Project
+    driver: com.mysql.cj.jdbc.Driver
+
+ebean:
+  default:
+    packages:com.example.starter.model
+  ddl:
+    generate: false
+    run: false
+
