@@ -3,6 +3,7 @@ package com.example.starter.config;
 import com.example.starter.controller.Kyc.CheckStatusOfKyc;
 import com.example.starter.controller.Kyc.KycUpload;
 import com.example.starter.controller.Kyc.StudentKycUpload;
+import com.example.starter.controller.Ocr.OcrController;
 import com.example.starter.controller.Student.DeleteStudentById;
 import com.example.starter.controller.Student.GetStudentById;
 import com.example.starter.controller.Student.StudentLogin;
@@ -42,10 +43,15 @@ public enum StudentRouter implements Handler<RoutingContext> {
 //      .handler(BodyHandler.create().setUploadsDirectory("uploads"))
 //      .handler(StudentKycUpload.INSTANCE);
 
-    router.route("/student/*")
-        .handler(BodyHandler.create().setUploadsDirectory("uploads"));
 
-  // JWT AFTER body parsing
+    router.route("/student/*")
+      .handler(BodyHandler.create()
+        .setUploadsDirectory("uploads")
+        .setBodyLimit(10 * 1024 * 1024) // 10 MB
+      );
+
+
+    // JWT AFTER body parsing
     router.route("/student/*")
         .handler(StudentJwtAuthHandler.INSTANCE);
 

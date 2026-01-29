@@ -13,7 +13,7 @@ import java.util.Date;
 public enum AdminLogin implements Handler<RoutingContext> {
   INSTANCE;
 
-  private AdminRepository adminRepository = new AdminRepository();
+  private final AdminRepository adminRepository = new AdminRepository();
   private static final String SECRET_KEY = "sadfkjhbdsfiulhefbasdjfh12312adsf";
   private static final long EXPIRATION_TIME = 15*60*1000;
 

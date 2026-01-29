@@ -19,5 +19,4 @@ public class AdminRepository {
       .eq("email", email)
       .findOne();
   }
-
 }

@@ -59,7 +59,7 @@ public class BulkUploadProcessor {
         String email = data[1].trim();
         String mobile = data[2].trim();
         String roleStr = data[3].trim();
-        String password = data[4].trim(); // CORRECT INDEX
+        String password = data[4].trim();
 
         // duplicate in same file
         if(!emailSet.add(email)){
