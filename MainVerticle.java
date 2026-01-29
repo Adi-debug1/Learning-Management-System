@@ -4,10 +4,12 @@ import com.example.starter.config.AdminRouter;
 import com.example.starter.config.StudentRouter;
 import com.example.starter.config.TeacherRouter;
 import com.example.starter.controller.Kyc.StudentKycUpload;
+import com.example.starter.controller.Kyc.TeacherKycUpload;
 import com.example.starter.controller.Ocr.OcrController;
 import com.example.starter.ocr.OcrServiceHolder;
 import io.ebean.DB;
 import io.ebean.Database;
+import io.github.cdimascio.dotenv.Dotenv;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -34,6 +36,7 @@ public class MainVerticle extends AbstractVerticle {
       return;
     }
 
+    TeacherKycUpload.INSTANCE.init(vertx);
     StudentKycUpload.INSTANCE.init(vertx);
     OcrServiceHolder.init(vertx);
 

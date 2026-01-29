@@ -28,7 +28,7 @@ public enum TeacherKycUpload implements Handler<RoutingContext> {
   @Override
   public void handle(RoutingContext ctx) {
 
-    System.out.println("[KYC] StudentKycUpload called");
+    System.out.println("[KYC] TeacherKycUpload called");
 
     String email = ctx.get("email");
     String role = ctx.get("role");
@@ -79,14 +79,16 @@ public enum TeacherKycUpload implements Handler<RoutingContext> {
 
     if (repository.findByUserEmailAndType(email, documentType) != null) {
       System.out.println("[KYC][ERROR] KYC already exists for this user");
-      ctx.fail(409);
+      ctx.response()
+        .setStatusCode(409)
+        .end("You already upload KYC, talk to admin for update!");
       return;
     }
 
     // ---- SAVE INITIAL KYC (FAST)
     KycDocument doc = new KycDocument();
     doc.setUserEmail(email);
-    doc.setRole(Role.STUDENT);
+    doc.setRole(Role.TEACHER);
     doc.setDocumentType(documentType);
     doc.setFileName(file.fileName());
     doc.setFileUrl(file.uploadedFileName());
@@ -108,7 +110,7 @@ public enum TeacherKycUpload implements Handler<RoutingContext> {
 
         System.out.println("[KYC] Calling AI validation");
         aiService.validateKyc(
-          "STUDENT",
+          "TEACHER",
           documentType.name(),
           fullName,
           docNumber,

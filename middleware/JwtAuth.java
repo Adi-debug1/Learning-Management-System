@@ -10,7 +10,7 @@ import io.vertx.ext.web.RoutingContext;
 public enum JwtAuth implements Handler<RoutingContext> {
   INSTANCE;
 
-  private static final String SECRET_KEY = "sadfkjhbdsfiulhefbasdjfh12312adsf";
+  private static final String SECRET_KEY = System.getenv("SECRET_KEY");
 
   @Override
   public void handle(RoutingContext ctx) {

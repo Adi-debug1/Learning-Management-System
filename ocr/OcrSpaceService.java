@@ -1,5 +1,6 @@
 package com.example.starter.ocr;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -11,8 +12,9 @@ import io.vertx.ext.web.multipart.MultipartForm;
 
 public class OcrSpaceService {
 
-  private static final String OCR_URL = "https://api.ocr.space/parse/image";
-  private static final String API_KEY = "772b6458c288957";
+  Dotenv dotenv = Dotenv.load();
+  private final String OCR_URL = dotenv.get("OCR_URL");
+  private final String API_KEY = dotenv.get("OCR_API_KEY");
 
   private final WebClient client;
   private final Vertx vertx;

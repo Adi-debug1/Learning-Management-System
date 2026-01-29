@@ -1,5 +1,6 @@
 package com.example.starter.security;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -9,7 +10,8 @@ import io.vertx.ext.web.RoutingContext;
 
 public enum StudentJwtAuthHandler implements Handler<RoutingContext> {
   INSTANCE;
-  private static final String SECRET_KEY = "sadfkjhbdsfiulhefbasdjfh12312adsf";
+  Dotenv dotenv = Dotenv.load();
+  private final String SECRET_KEY = dotenv.get("SECRET_KEY");
 
   @Override
   public void handle(RoutingContext ctx) {
